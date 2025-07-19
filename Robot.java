@@ -19,7 +19,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends LoggedRobot   {
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
-  public static final boolean USE_REPLAY_IN_SIM = false;
+  public static final boolean USE_REPLAY_IN_SIM = false; 
+  // while true use log file on sim if fasle use live sim
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
@@ -29,30 +30,23 @@ public class Robot extends LoggedRobot   {
    */
   @Override
   public void robotInit() {
-    Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+    Logger.recordMetadata("2025bot", "MyProject"); // Set a metadata value
 
-    if (isReal()) {
+    if (isReal()|| !(USE_REPLAY_IN_SIM)) {
+      // use if work on real robot or on sim 
       Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
       Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
   } else {
-      // Simulation mode
-      if (USE_REPLAY_IN_SIM) {
           // Replay mode - reads from log file
           setUseTiming(false); // Run as fast as possible
           String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope
           Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
           Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
-      } else {
-          // Live simulation mode - runs your code live
-          Logger.addDataReceiver(new NT4Publisher()); // Publish live data to NetworkTables
-          Logger.addDataReceiver(new WPILOGWriter()); // Also log to file for later analysis
-      }
-
+  }
 Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
   m_robotContainer = new RobotContainer();
-  }
   }
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like
